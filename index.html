@@ -683,32 +683,28 @@
         </div>
     </section>
 
-    <!-- SDKs de Firebase (Realtime Database) -->
+    <!-- SDKs de Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <script>
-        // CONFIGURACIÓN DE FIREBASE (Sincronización en la Nube Multi-dispositivo)
-        // INSTRUCCIÓN: Crea un proyecto gratuito en firebase.google.com, activa "Realtime Database" 
-        // y pega tus credenciales abajo para que se sincronice en tiempo real entre tus teléfonos.
         const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "tu-proyecto.firebaseapp.com",
-            databaseURL: "https://tu-proyecto-default-rtdb.firebaseio.com",
-            projectId: "tu-proyecto",
-            storageBucket: "tu-proyecto.appspot.com",
-            messagingSenderId: "tu-id",
-            appId: "tu-id"
+            apiKey: "AIzaSyCF4_W4tVEzjjFP1E_BOqV4HKXFD3LCPGs",
+            authDomain: "maderas-imbabura.firebaseapp.com",
+            databaseURL: "https://maderas-imbabura-default-rtdb.firebaseio.com",
+            projectId: "maderas-imbabura",
+            storageBucket: "maderas-imbabura.firebasestorage.app",
+            messagingSenderId: "64736849626",
+            appId: "1:64736849626:web:e58a75ab812caf6df3bfe3"
         };
 
-        // Si Firebase está configurado, usa la nube; si no, opera de respaldo local temporal.
         let usaFirebase = false;
         try {
-            if (firebaseConfig.apiKey !== "TU_API_KEY") {
-                firebase.initializeApp(firebaseConfig);
-                usaFirebase = true;
-            }
-        } catch (e) { console.warn("Firebase no configurado, operando en modo local."); }
+            firebase.initializeApp(firebaseConfig);
+            usaFirebase = true;
+        } catch (e) { 
+            console.warn("Error con Firebase, operando en modo local.", e); 
+        }
 
         const productosIniciales = [
             { id: 'tabla_encofrado', nombre: 'Tabla de encofrado', requiereMedida: false, stock: 0, capacidadMax: 150 },
@@ -756,12 +752,10 @@
         }
 
         function guardarTodo() {
-            // Guardar localmente siempre
             localStorage.setItem('mi_inventario_3d', JSON.stringify(inventario));
             localStorage.setItem('mi_ventas_3d', JSON.stringify(ventas));
             localStorage.setItem('mi_gastos_3d', JSON.stringify(gastos));
 
-            // Si Firebase está configurado, sube los cambios a la nube en tiempo real para todos los teléfonos
             if (usaFirebase) {
                 firebase.database().ref('maderas_imbabura_data').set({
                     inventario: inventario,
@@ -905,6 +899,8 @@
 
                 gastos.push({
                     id: 'g_' + Date.now(),
+                    productoId: prod.id,
+                    cantidadComprada: cantidad,
                     fecha: new Date().toLocaleDateString(),
                     descripcion: `Compra ${cantidad}u. ${prod.nombre}` + (medida ? ` (${medida})` : ''),
                     monto: costo
@@ -966,14 +962,28 @@
         }
 
         function eliminarVenta(id) {
-            if (confirm("¿Estás seguro de eliminar este registro de venta?")) {
+            if (confirm("¿Estás seguro de anular esta venta? Las unidades regresarán automáticamente al inventario.")) {
+                const venta = ventas.find(v => v.id === id);
+                if (venta && venta.productoId) {
+                    const prod = inventario.find(p => p.id === venta.productoId);
+                    if (prod) {
+                        prod.stock += venta.cantidad; // Devuelve las unidades al stock
+                    }
+                }
                 ventas = ventas.filter(v => v.id !== id);
                 guardarTodo();
             }
         }
 
         function eliminarGasto(id) {
-            if (confirm("¿Estás seguro de eliminar este registro de gasto?")) {
+            if (confirm("¿Estás seguro de anular este gasto/compra? Si correspondía a una entrada de madera, se restarán esas unidades del stock.")) {
+                const gasto = gastos.find(g => g.id === id);
+                if (gasto && gasto.productoId && gasto.cantidadComprada) {
+                    const prod = inventario.find(p => p.id === gasto.productoId);
+                    if (prod) {
+                        prod.stock = Math.max(0, prod.stock - gasto.cantidadComprada); // Resta las unidades del stock
+                    }
+                }
                 gastos = gastos.filter(g => g.id !== id);
                 guardarTodo();
             }
