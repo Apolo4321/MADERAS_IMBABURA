@@ -11,6 +11,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Canvas-Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- SortableJS para arrastrar y reordenar casillas -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <!-- Google Fonts Outfit & Inter -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap">
 
@@ -305,6 +307,7 @@
             margin-top: 12px;
         }
 
+        /* Casilla de Producto con Mover/Drag */
         .product-card-3d {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -312,6 +315,18 @@
             padding: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             position: relative;
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .product-card-3d:active {
+            cursor: grabbing;
+        }
+
+        .sortable-ghost {
+            opacity: 0.4;
+            border: 1px dashed var(--emerald-bright);
         }
 
         .product-title {
@@ -322,6 +337,13 @@
             align-items: center;
             justify-content: space-between;
             padding-right: 22px;
+        }
+
+        .drag-handle {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-right: 6px;
+            cursor: grab;
         }
 
         .btn-delete-prod {
@@ -456,7 +478,6 @@
             color: #fca5a5;
         }
 
-        /* Notificación Flotante en tiempo real */
         #toastNotif {
             position: fixed;
             bottom: 20px;
@@ -532,7 +553,6 @@
         </div>
     </div>
 
-    <!-- Navegación de 3 Pestañas (Inventario, Registro, Análisis) -->
     <nav class="main-nav">
         <button class="btn-nav-pill active" onclick="showSection('inventario', this)">
             <i class="fa-solid fa-box-archive"></i> INVENTARIO
@@ -622,7 +642,10 @@
             </form>
         </div>
 
-        <h3 style="font-size:0.95rem; margin-top:15px; color:#e5e7eb;">Estado Actual del Stock</h3>
+        <h3 style="font-size:0.95rem; margin-top:15px; color:#e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+            <span>Estado Actual del Stock</span>
+            <small style="color: var(--text-muted); font-weight: normal; font-size: 0.75rem;">💡 Manten presionada una casilla para arrastrar y reordenar</small>
+        </h3>
         <div id="gridInventario" class="inventory-grid"></div>
     </section>
 
@@ -711,7 +734,7 @@
         </div>
     </section>
 
-    <!-- NUEVA SECCIÓN: ANÁLISIS DE VENTAS Y TENDENCIAS -->
+    <!-- SECCIÓN ANÁLISIS DE VENTAS -->
     <section id="sec-analisis" class="section-card">
         <h2><i class="fa-solid fa-chart-line"></i> Análisis de Ventas y Estacionalidad</h2>
         <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">
@@ -721,7 +744,6 @@
         <div id="contenedorRanking" style="display: flex; flex-direction: column; gap: 10px;"></div>
     </section>
 
-    <!-- Notificación Flotante -->
     <div id="toastNotif"></div>
 
     <!-- SDKs de Firebase -->
@@ -765,6 +787,7 @@
         let ventas = [];
         let gastos = [];
         let chartBalanceInstance = null;
+        let sortableInstance = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             if (usaFirebase) {
@@ -798,6 +821,7 @@
             actualizarMetricas();
             actualizarGraficos();
             renderAnalisis();
+            inicializarDragAndDrop();
         }
 
         function guardarTodo() {
@@ -814,6 +838,27 @@
             }
 
             sincronizarUICompleta();
+        }
+
+        // Configuración de SortableJS para arrastrar tarjetas
+        function inicializarDragAndDrop() {
+            const grid = document.getElementById('gridInventario');
+            if (!grid) return;
+
+            if (sortableInstance) sortableInstance.destroy();
+
+            sortableInstance = new Sortable(grid, {
+                animation: 200,
+                ghostClass: 'sortable-ghost',
+                delay: 150, // Pequeño retraso para toque prolongado en móviles
+                delayOnTouchOnly: true,
+                onEnd: function (evt) {
+                    // Reordenar array de inventario tras mover casilla
+                    const movedItem = inventario.splice(evt.oldIndex, 1)[0];
+                    inventario.splice(evt.newIndex, 0, movedItem);
+                    guardarTodo();
+                }
+            });
         }
 
         function showSection(sectionId, btnElem) {
@@ -994,7 +1039,7 @@
                 ventas.push({
                     id: 'v_' + Date.now(),
                     fecha: new Date().toLocaleDateString(),
-                    mesAnno: new Date().toISOString().slice(0, 7), // Para análisis de estacionalidad (YYYY-MM)
+                    mesAnno: new Date().toISOString().slice(0, 7),
                     productoId: prod.id,
                     productoNombre: prod.nombre + (medida ? ` (${medida})` : ''),
                     nombrePuro: prod.nombre,
@@ -1084,13 +1129,14 @@
                 const estilo = obtenerEstiloBarra(prod.stock || 0, prod.capacidadMax || 100);
                 const card = document.createElement('div');
                 card.className = 'product-card-3d';
+                card.setAttribute('data-id', prod.id);
                 
                 card.innerHTML = `
                     <button class="btn-delete-prod" onclick="eliminarProducto('${prod.id}')" title="Eliminar producto">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
                     <div class="product-title">
-                        <span>${prod.nombre}</span>
+                        <span><i class="fa-solid fa-grip-vertical drag-handle"></i> ${prod.nombre}</span>
                     </div>
                     <div style="margin-top:2px;"><span class="product-badge">${prod.requiereMedida ? 'Medida' : 'Estándar'}</span></div>
                     <div class="product-qty">${prod.stock || 0} <span>unidades</span></div>
@@ -1129,7 +1175,6 @@
             });
         }
 
-        // Lógica de Análisis: Ranking de Más/Menos Vendidos y Estacionalidad
         function renderAnalisis() {
             const contenedor = document.getElementById('contenedorRanking');
             if (!contenedor) return;
@@ -1140,7 +1185,6 @@
                 return;
             }
 
-            // Agrupar por producto y por época/mes
             const statsProductos = {};
             ventas.forEach(v => {
                 const nombre = v.nombrePuro || 'Producto';
@@ -1154,12 +1198,10 @@
                 statsProductos[nombre].mesesDemanda[mes] = (statsProductos[nombre].mesesDemanda[mes] || 0) + v.cantidad;
             });
 
-            // Ordenar del más vendido al menos vendido
             const ranking = Object.keys(statsProductos).sort((a, b) => statsProductos[b].totalCantidad - statsProductos[a].totalCantidad);
 
             ranking.forEach((prod, index) => {
                 const info = statsProductos[prod];
-                // Encontrar el mes de mayor venta (Estacionalidad)
                 let mejorMes = 'N/A';
                 let maxCantMes = 0;
                 Object.keys(info.mesesDemanda).forEach(m => {
