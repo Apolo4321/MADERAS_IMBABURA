@@ -120,6 +120,18 @@
             margin-bottom: 15px;
         }
 
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
         label {
             display: block;
             font-weight: bold;
@@ -134,6 +146,12 @@
             border: 2px solid #ccc;
             border-radius: 8px;
             margin-top: 5px;
+        }
+
+        input[readonly] {
+            background-color: #e9ecef;
+            font-weight: bold;
+            color: #1b5e20;
         }
 
         button.btn-submit {
@@ -248,6 +266,34 @@
         .btn-analisis:hover {
             background-color: #01579b;
         }
+
+        .backup-bar {
+            background: #fff3e0;
+            border: 2px dashed #ff9800;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .btn-secundario {
+            background-color: #f57c00;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-secundario:hover {
+            background-color: #e65100;
+        }
     </style>
 </head>
 <body>
@@ -256,6 +302,18 @@
         <h1>🪵 Depósito Maderas Imbabura</h1>
         <p>Control de Inventario, Ventas y Gastos fácil y rápido</p>
     </header>
+
+    <!-- Barra de Resguardo de Datos -->
+    <div class="backup-bar">
+        <div>
+            <strong>💾 Copia de Seguridad:</strong> Guarda un respaldo de todos tus datos para que nunca se borren al actualizar el programa.
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-secundario" onclick="exportarDatos()">📥 Descargar Respaldo</button>
+            <button class="btn-secundario" style="background-color: #0288d1;" onclick="document.getElementById('inputImportar').click()">📤 Cargar Respaldo</button>
+            <input type="file" id="inputImportar" style="display:none;" accept=".json" onchange="importarDatos(event)">
+        </div>
+    </div>
 
     <!-- Tres Botones Principales -->
     <nav class="main-nav">
@@ -275,6 +333,45 @@
     <section id="sec-inventario" class="section-card active-section">
         <h2>📦 Gestor de Inventario</h2>
         
+        <!-- Formulario para Crear un Nuevo Producto en la Lista -->
+        <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 25px; border-left: 5px solid #0288d1;">
+            <h3>🆕 Agregar un Nuevo Producto al Menú</h3>
+            <p style="margin-bottom: 10px; color: #555;"><small>💡 Usa esto si vendes algún producto nuevo que no esté registrado en la lista.</small></p>
+            <form id="formNuevoProducto" onsubmit="crearNuevoProducto(event)">
+                <div class="form-group">
+                    <label>Nombre del Nuevo Producto:</label>
+                    <input type="text" id="nuevoNombreProd" required placeholder="Ej: Tablas de eucalipto, Caña guadua pulida, etc.">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Stock Inicial (Unidades):</label>
+                        <input type="number" id="nuevoStockProd" min="0" required placeholder="Ej: 50">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Capacidad Máxima Ideal:</label>
+                        <input type="number" id="nuevoMaxProd" min="1" required placeholder="Ej: 100 (para calcular la barra de llenado)">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>¿Requiere ingresar medida al vender o comprar?</label>
+                    <select id="nuevoRequiereMedida" onchange="toggleMedidaEtiqueta()">
+                        <option value="false">No (Se vende por unidad estándar)</option>
+                        <option value="true">Sí (Requiere poner largo, ancho o detalle)</option>
+                    </select>
+                </div>
+
+                <div id="boxEtiquetaMedida" class="form-group" style="display:none;">
+                    <label>Texto de la instrucción de medida:</label>
+                    <input type="text" id="nuevaEtiquetaMedida" placeholder="Ej: Medida en metros / Ancho y Largo:">
+                </div>
+
+                <button type="submit" class="btn-submit" style="background-color: #0288d1;">✨ Crear y Agregar Producto</button>
+            </form>
+        </div>
+
         <!-- Formulario para Comprar / Agregar Madera al Inventario -->
         <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
             <h3>➕ Registrar Compra / Reabastecimiento de Madera</h3>
@@ -291,14 +388,21 @@
                     <input type="text" id="txtMedidaCompra" placeholder="Ej: 3 metros / 2x4 pulgadas / largo y ancho">
                 </div>
 
-                <div class="form-group">
-                    <label>Cantidad de Unidades Compradas:</label>
-                    <input type="number" id="cantCompra" min="1" required placeholder="Ej: 50">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cantidad Comprada:</label>
+                        <input type="number" id="cantCompra" min="1" required placeholder="Ej: 50" oninput="calcularTotalCompra()">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Costo Unitario de Compra ($):</label>
+                        <input type="number" step="0.01" id="precioUnitarioCompra" min="0" required placeholder="Ej: 2.00" oninput="calcularTotalCompra()">
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label>Costo Total de la Compra ($):</label>
-                    <input type="number" step="0.01" id="costoCompra" min="0" required placeholder="Ej: 120.00">
+                    <input type="number" step="0.01" id="costoCompra" readonly placeholder="Calculado automáticamente">
                 </div>
 
                 <button type="submit" class="btn-submit">Ingresar Madera al Inventario</button>
@@ -315,6 +419,7 @@
     <!-- SECCIÓN 2: VENTAS -->
     <section id="sec-ventas" class="section-card">
         <h2>💰 Registrar Venta</h2>
+        <p style="margin-bottom: 15px; color: #555;"><small>💡 Puedes cambiar el precio unitario en cada venta según lo acordado con el cliente (por ejemplo $3.00 o $4.00).</small></p>
         <form id="formVenta" onsubmit="registrarVenta(event)">
             <div class="form-group">
                 <label>Producto a Vender:</label>
@@ -328,14 +433,21 @@
                 <input type="text" id="txtMedidaVenta" placeholder="Ej: Medida personalizada solicitada">
             </div>
 
-            <div class="form-group">
-                <label>Cantidad Vendida:</label>
-                <input type="number" id="cantVenta" min="1" required placeholder="Ej: 5">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Cantidad Vendida:</label>
+                    <input type="number" id="cantVenta" min="1" required placeholder="Ej: 5" oninput="calcularTotalVenta()">
+                </div>
+
+                <div class="form-group">
+                    <label>Precio Unitario de Venta Hoy ($):</label>
+                    <input type="number" step="0.01" id="precioUnitarioVenta" min="0" required placeholder="Ej: 3.00 o 4.00" oninput="calcularTotalVenta()">
+                </div>
             </div>
 
             <div class="form-group">
                 <label>Precio Total Cobrado ($):</label>
-                <input type="number" step="0.01" id="precioVenta" min="0" required placeholder="Ej: 45.00">
+                <input type="number" step="0.01" id="precioVenta" readonly placeholder="Calculado automáticamente">
             </div>
 
             <button type="submit" class="btn-submit" style="background-color: #2e7d32;">Registrar Venta (Resta del Inventario)</button>
@@ -361,7 +473,8 @@
                     <th>Fecha</th>
                     <th>Producto</th>
                     <th>Cantidad</th>
-                    <th>Total</th>
+                    <th>P. Unitario de Venta</th>
+                    <th>Total Cobrado</th>
                 </tr>
             </thead>
             <tbody id="tablaVentas">
@@ -406,7 +519,7 @@
     </section>
 
     <script>
-        // Lista completa de productos solicitada
+        // Lista base de productos
         const productosIniciales = [
             { id: 'tabla_encofrado', nombre: 'Tabla de encofrado', requiereMedida: false, stock: 100, capacidadMax: 200 },
             { id: 'guaduas', nombre: 'Guaduas', requiereMedida: false, stock: 80, capacidadMax: 150 },
@@ -428,7 +541,7 @@
             { id: 'postes', nombre: 'Postes', requiereMedida: true, etiquetaMedida: 'Medida:', stock: 45, capacidadMax: 100 }
         ];
 
-        // Cargar datos persistentes de localStorage
+        // Cargar datos persistentes
         let inventario = JSON.parse(localStorage.getItem('mi_inventario')) || productosIniciales;
         let ventas = JSON.parse(localStorage.getItem('mi_ventas')) || [];
         let gastos = JSON.parse(localStorage.getItem('mi_gastos')) || [];
@@ -447,7 +560,7 @@
             verificarAlertasStock();
         });
 
-        // Guardar datos en el almacenamiento interno del dispositivo
+        // Guardar datos
         function guardarTodo() {
             localStorage.setItem('mi_inventario', JSON.stringify(inventario));
             localStorage.setItem('mi_ventas', JSON.stringify(ventas));
@@ -456,7 +569,42 @@
             actualizarGraficos();
         }
 
-        // Navegación entre las 3 pestañas principales
+        // Crear un producto nuevo desde el formulario
+        function toggleMedidaEtiqueta() {
+            const req = document.getElementById('nuevoRequiereMedida').value;
+            document.getElementById('boxEtiquetaMedida').style.display = (req === 'true') ? 'block' : 'none';
+        }
+
+        function crearNuevoProducto(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('nuevoNombreProd').value.trim();
+            const stock = parseInt(document.getElementById('nuevoStockProd').value);
+            const max = parseInt(document.getElementById('nuevoMaxProd').value);
+            const reqMedida = document.getElementById('nuevoRequiereMedida').value === 'true';
+            const etiqueta = document.getElementById('nuevaEtiquetaMedida').value.trim() || 'Especificar Medida:';
+
+            // Generar ID único
+            const id = 'prod_' + Date.now();
+
+            const nuevoProd = {
+                id: id,
+                nombre: nombre,
+                requiereMedida: reqMedida,
+                etiquetaMedida: etiqueta,
+                stock: stock,
+                capacidadMax: max
+            };
+
+            inventario.push(nuevoProd);
+            guardarTodo();
+            poblarSelectores();
+            renderInventario();
+            document.getElementById('formNuevoProducto').reset();
+            toggleMedidaEtiqueta();
+            alert(`✅ ¡Producto "${nombre}" agregado con éxito al sistema!`);
+        }
+
+        // Navegación
         function showSection(sectionId) {
             document.querySelectorAll('.section-card').forEach(sec => sec.classList.remove('active-section'));
             document.querySelectorAll('.btn-main').forEach(btn => btn.classList.remove('active'));
@@ -465,7 +613,20 @@
             event.currentTarget.classList.add('active');
         }
 
-        // Poblar selectores de productos
+        // Cálculos Automáticos
+        function calcularTotalCompra() {
+            const cant = parseFloat(document.getElementById('cantCompra').value) || 0;
+            const precioUnit = parseFloat(document.getElementById('precioUnitarioCompra').value) || 0;
+            document.getElementById('costoCompra').value = (cant * precioUnit).toFixed(2);
+        }
+
+        function calcularTotalVenta() {
+            const cant = parseFloat(document.getElementById('cantVenta').value) || 0;
+            const precioUnit = parseFloat(document.getElementById('precioUnitarioVenta').value) || 0;
+            document.getElementById('precioVenta').value = (cant * precioUnit).toFixed(2);
+        }
+
+        // Poblar selectores
         function poblarSelectores() {
             const selectCompra = document.getElementById('prodCompra');
             const selectVenta = document.getElementById('prodVenta');
@@ -488,7 +649,6 @@
             toggleMedidas('venta');
         }
 
-        // Mostrar u ocultar campo de medidas personalizadas
         function toggleMedidas(tipo) {
             const select = document.getElementById(tipo === 'compra' ? 'prodCompra' : 'prodVenta');
             const box = document.getElementById(tipo === 'compra' ? 'medidasCompra' : 'medidasVenta');
@@ -503,11 +663,12 @@
             }
         }
 
-        // Registrar compra (Aumenta inventario y registra como gasto automático)
+        // Registrar compra
         function registrarCompra(e) {
             e.preventDefault();
             const prodId = document.getElementById('prodCompra').value;
             const cantidad = parseInt(document.getElementById('cantCompra').value);
+            const precioUnit = parseFloat(document.getElementById('precioUnitarioCompra').value);
             const costo = parseFloat(document.getElementById('costoCompra').value);
             const medida = document.getElementById('txtMedidaCompra').value;
 
@@ -516,8 +677,7 @@
                 prod.stock += cantidad;
                 if (prod.stock > prod.capacidadMax) prod.capacidadMax = prod.stock;
 
-                // Agregar automáticamente a gastos la compra de material
-                const detalle = `Compra de ${cantidad} u. de ${prod.nombre}` + (medida ? ` (${medida})` : '');
+                const detalle = `Compra de ${cantidad} u. de ${prod.nombre}` + (medida ? ` (${medida})` : '') + ` @ $${precioUnit.toFixed(2)} c/u`;
                 gastos.push({
                     fecha: new Date().toLocaleDateString(),
                     mesAnno: new Date().toISOString().slice(0, 7),
@@ -529,16 +689,18 @@
                 renderInventario();
                 renderGastos();
                 document.getElementById('formInventario').reset();
+                document.getElementById('costoCompra').value = '';
                 alert('✅ Inventario actualizado y gasto registrado con éxito');
             }
         }
 
-        // Registrar Venta (Disminuye inventario automáticamente)
+        // Registrar Venta
         function registrarVenta(e) {
             e.preventDefault();
             const prodId = document.getElementById('prodVenta').value;
             const cantidad = parseInt(document.getElementById('cantVenta').value);
-            const precio = parseFloat(document.getElementById('precioVenta').value);
+            const precioUnit = parseFloat(document.getElementById('precioUnitarioVenta').value);
+            const precioTotal = parseFloat(document.getElementById('precioVenta').value);
             const medida = document.getElementById('txtMedidaVenta').value;
 
             const prod = inventario.find(p => p.id === prodId);
@@ -556,14 +718,16 @@
                     productoId: prod.id,
                     productoNombre: prod.nombre + (medida ? ` (${medida})` : ''),
                     cantidad: cantidad,
-                    total: precio
+                    precioUnitario: precioUnit,
+                    total: precioTotal
                 });
 
                 guardarTodo();
                 renderInventario();
                 renderVentas();
                 document.getElementById('formVenta').reset();
-                alert('✅ Venta registrada e inventario descontado correctamente');
+                document.getElementById('precioVenta').value = '';
+                alert(`✅ Venta registrada a $${precioUnit.toFixed(2)} c/u e inventario descontado correctamente`);
             }
         }
 
@@ -586,7 +750,7 @@
             alert('✅ Gasto registrado con éxito');
         }
 
-        // Renderizar Tarjetas de Inventario con Barras de Estado
+        // Renderizar Tarjetas de Inventario
         function renderInventario() {
             const container = document.getElementById('gridInventario');
             container.innerHTML = '';
@@ -614,7 +778,7 @@
             });
         }
 
-        // Mostrar Alertas si el stock es bajo
+        // Verificar Alertas de Stock
         function verificarAlertasStock() {
             const alertBox = document.getElementById('alertBox');
             const alertList = document.getElementById('alertList');
@@ -644,6 +808,7 @@
                         <td>${v.fecha}</td>
                         <td>${v.productoNombre}</td>
                         <td>${v.cantidad}</td>
+                        <td>$${(v.precioUnitario || 0).toFixed(2)}</td>
                         <td>$${v.total.toFixed(2)}</td>
                     </tr>
                 `;
@@ -664,7 +829,7 @@
             });
         }
 
-        // Análisis de Datos Mes a Mes
+        // Análisis de Datos
         function toggleAnalisis() {
             const box = document.getElementById('boxAnalisis');
             if (box.style.display === 'none') {
@@ -684,7 +849,6 @@
                 return;
             }
 
-            // Agrupar ventas por mes y producto
             const ventasPorMes = {};
 
             ventas.forEach(v => {
@@ -716,12 +880,10 @@
             });
         }
 
-        // Calibración y Renderizado de Gráficos
+        // Gráficos
         function actualizarGraficos() {
-            // 1. Gráfico de Ventas
             const ctxVentas = document.getElementById('chartVentas').getContext('2d');
             
-            // Agrupar ventas por producto
             const ventasMap = {};
             ventas.forEach(v => {
                 const nombreLimpio = v.productoNombre.split(' (')[0];
@@ -751,7 +913,6 @@
                 }
             });
 
-            // 2. Gráfico Balance Ingresos vs Gastos
             const ctxBalance = document.getElementById('chartBalance').getContext('2d');
             const totalIngresos = ventas.reduce((acc, v) => acc + v.total, 0);
             const totalGastos = gastos.reduce((acc, g) => acc + g.monto, 0);
@@ -771,6 +932,51 @@
                     responsive: true
                 }
             });
+        }
+
+        // Funciones de Exportación e Importación de Respaldo
+        function exportarDatos() {
+            const respaldo = {
+                inventario: inventario,
+                ventas: ventas,
+                gastos: gastos
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(respaldo, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `maderas_imbabura_respaldo_${new Date().toISOString().slice(0, 10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importarDatos(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const datos = JSON.parse(evt.target.result);
+                    if (datos.inventario && datos.ventas && datos.gastos) {
+                        inventario = datos.inventario;
+                        ventas = datos.ventas;
+                        gastos = datos.gastos;
+                        guardarTodo();
+                        poblarSelectores();
+                        renderInventario();
+                        renderVentas();
+                        renderGastos();
+                        alert("✅ ¡Copia de seguridad restaurada con éxito!");
+                    } else {
+                        alert("⚠️ El archivo seleccionado no contiene el formato correcto de respaldo.");
+                    }
+                } catch (err) {
+                    alert("⚠️ Error al leer el archivo de respaldo.");
+                }
+            };
+            reader.readAsText(file);
         }
     </script>
 </body>
