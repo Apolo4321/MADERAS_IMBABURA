@@ -937,7 +937,7 @@
             mostrarNotificacion(`Nuevo producto agregado: ${nombre}`);
         }
 
-        // Función para editar tanto el nombre como el stock del producto
+        // Función para editar tanto el nombre como las unidades (stock)
         function editarProducto(id) {
             const prod = inventario.find(p => p.id === id);
             if (!prod) return;
@@ -945,7 +945,7 @@
             const nuevoNombre = prompt("Editar nombre del producto:", prod.nombre);
             if (nuevoNombre === null) return; // Si cancela
 
-            const nuevoStockStr = prompt(`Editar cantidad en stock para "${prod.nombre}":`, prod.stock);
+            const nuevoStockStr = prompt(`Editar cantidad en stock para "${nuevoNombre.trim() || prod.nombre}":`, prod.stock);
             if (nuevoStockStr === null) return; // Si cancela
 
             const nuevoStock = parseInt(nuevoStockStr);
@@ -957,7 +957,6 @@
             prod.nombre = nuevoNombre.trim() || prod.nombre;
             prod.stock = nuevoStock;
 
-            // Ajustar capacidad máxima si el stock supera el límite actual
             if (prod.stock > prod.capacidadMax) {
                 prod.capacidadMax = Math.ceil(prod.stock * 1.2);
             }
@@ -1167,7 +1166,7 @@
                 
                 card.innerHTML = `
                     <div class="card-actions">
-                        <button class="btn-action-card edit" onclick="editarProducto('${prod.id}')" title="Editar producto y unidades">
+                        <button class="btn-action-card edit" onclick="editarProducto('${prod.id}')" title="Editar nombre y stock">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
                         <button class="btn-action-card delete" onclick="eliminarProducto('${prod.id}')" title="Eliminar producto">
