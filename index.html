@@ -17,15 +17,11 @@
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #0b170e 0%, #132a1a 50%, #060d07 100%);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.12);
             --glass-card: rgba(18, 38, 23, 0.65);
-            --glass-card-hover: rgba(28, 58, 34, 0.8);
             --emerald-bright: #10b981;
             --emerald-glow: rgba(16, 185, 129, 0.35);
             --wood-gold: #f59e0b;
             --danger-red: #ef4444;
-            --danger-glow: rgba(239, 68, 68, 0.35);
             --text-main: #f3f4f6;
             --text-muted: #9ca3af;
             --radius-lg: 14px;
@@ -49,14 +45,13 @@
             padding: 12px 10px 30px;
         }
 
-        /* Header Compacto */
         header {
             text-align: center;
             margin-bottom: 12px;
             padding: 10px 15px;
             background: var(--glass-card);
             backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-3d);
         }
@@ -75,7 +70,6 @@
             text-transform: uppercase;
         }
 
-        /* Barra de Copia de Seguridad Compacta */
         .backup-bar {
             background: rgba(245, 158, 11, 0.06);
             border: 1px solid rgba(245, 158, 11, 0.2);
@@ -123,7 +117,6 @@
             transform: translateY(-1px);
         }
 
-        /* Menú Navegación Compacto (2 Pestañas) */
         .main-nav {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -133,7 +126,7 @@
 
         .btn-nav-pill {
             background: var(--glass-card);
-            border: 1px solid var(--glass-border);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             color: var(--text-muted);
             padding: 10px 12px;
             font-size: 0.95rem;
@@ -156,7 +149,6 @@
             box-shadow: 0 4px 15px var(--emerald-glow);
         }
 
-        /* Tarjetas Métricas Reducidas */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -166,7 +158,7 @@
 
         .metric-card {
             background: var(--glass-card);
-            border: 1px solid var(--glass-border);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             padding: 10px;
             border-radius: var(--radius-md);
             backdrop-filter: blur(10px);
@@ -200,7 +192,7 @@
 
         .section-card {
             background: var(--glass-card);
-            border: 1px solid var(--glass-border);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             padding: 16px;
             border-radius: var(--radius-lg);
             backdrop-filter: blur(14px);
@@ -225,7 +217,6 @@
             padding-bottom: 8px;
         }
 
-        /* Formulario Optimizado */
         .form-glass-container {
             background: rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.06);
@@ -306,7 +297,6 @@
             margin-top: 6px;
         }
 
-        /* Catálogo de Inventario Optimizado */
         .inventory-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -320,12 +310,7 @@
             border-radius: var(--radius-md);
             padding: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
-        }
-
-        .product-card-3d:hover {
-            border-color: rgba(16, 185, 129, 0.4);
-            transform: translateY(-2px);
+            position: relative;
         }
 
         .product-title {
@@ -335,6 +320,23 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            padding-right: 22px;
+        }
+
+        .btn-delete-prod {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+
+        .btn-delete-prod:hover {
+            color: var(--danger-red);
         }
 
         .product-badge {
@@ -361,7 +363,6 @@
             color: var(--text-muted);
         }
 
-        /* Barra de Progreso Dinámica / Escala de Colores */
         .bar-container-3d {
             width: 100%;
             background: rgba(0, 0, 0, 0.5);
@@ -370,7 +371,6 @@
             overflow: hidden;
             margin-top: 8px;
             border: 1px solid rgba(255,255,255,0.05);
-            position: relative;
         }
 
         .bar-fill-3d {
@@ -379,7 +379,6 @@
             transition: width 0.5s ease, background 0.4s ease;
         }
 
-        /* Tablas Compactas */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -404,6 +403,20 @@
             font-size: 0.72rem;
         }
 
+        .btn-delete-row {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+            padding: 3px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .btn-delete-row:hover {
+            background: rgba(239, 68, 68, 0.4);
+        }
+
         .chart-container {
             position: relative;
             max-height: 220px;
@@ -424,7 +437,7 @@
             padding: 8px;
             font-weight: 700;
             border-radius: 8px;
-            border: 1px solid var(--glass-border);
+            border: 1px solid rgba(255,255,255,0.12);
             background: rgba(255,255,255,0.05);
             color: var(--text-muted);
             cursor: pointer;
@@ -449,24 +462,22 @@
         <h1><i class="fa-solid fa-tree"></i> MADERAS IMBABURA</h1>
     </header>
 
-    <!-- Barra de Resguardo de Datos Compacta -->
     <div class="backup-bar">
         <div class="backup-bar-text">
             <i class="fa-solid fa-shield-halved"></i>
-            <span>Resguardo de Datos</span>
+            <span>Sincronización en la Nube Activa</span>
         </div>
         <div style="display: flex; gap: 6px;">
             <button class="btn-mini" onclick="exportarDatos()">
-                <i class="fa-solid fa-download"></i> Descargar
+                <i class="fa-solid fa-download"></i> Copia JSON
             </button>
             <button class="btn-mini" style="background: rgba(2, 136, 209, 0.2); border-color: #0288d1;" onclick="document.getElementById('inputImportar').click()">
-                <i class="fa-solid fa-upload"></i> Cargar
+                <i class="fa-solid fa-upload"></i> Restaurar
             </button>
             <input type="file" id="inputImportar" style="display:none;" accept=".json" onchange="importarDatos(event)">
         </div>
     </div>
 
-    <!-- Métricas del Sistema -->
     <div class="metrics-grid">
         <div class="metric-card">
             <div class="metric-info">
@@ -497,7 +508,6 @@
         </div>
     </div>
 
-    <!-- Menú de Selección (2 Secciones Fusionadas) -->
     <nav class="main-nav">
         <button class="btn-nav-pill active" onclick="showSection('inventario', this)">
             <i class="fa-solid fa-box-archive"></i> INVENTARIO
@@ -511,7 +521,6 @@
     <section id="sec-inventario" class="section-card active-section">
         <h2><i class="fa-solid fa-cubes"></i> Control e Ingreso de Inventario</h2>
 
-        <!-- Formulario Crear Producto -->
         <div class="form-glass-container">
             <h3><i class="fa-solid fa-plus-circle"></i> Nuevo Producto en Catálogo</h3>
             <form id="formNuevoProducto" onsubmit="crearNuevoProducto(event)">
@@ -550,7 +559,6 @@
             </form>
         </div>
 
-        <!-- Formulario Reabastecimiento -->
         <div class="form-glass-container">
             <h3><i class="fa-solid fa-truck-ramp-box"></i> Registrar Compra (Reabastecer)</h3>
             <form id="formInventario" onsubmit="registrarCompra(event)">
@@ -594,7 +602,6 @@
     <section id="sec-registro" class="section-card">
         <h2><i class="fa-solid fa-cash-register"></i> Registro Unificado de Operaciones</h2>
 
-        <!-- Selector de Modo Venta / Gasto -->
         <div class="type-toggle">
             <button id="btnModoVenta" class="active-venta" onclick="setModoRegistro('venta')">
                 <i class="fa-solid fa-sack-dollar"></i> REGISTRAR VENTA
@@ -604,7 +611,6 @@
             </button>
         </div>
 
-        <!-- FORMULARIO VENTA -->
         <form id="formVenta" onsubmit="registrarVenta(event)">
             <div class="form-group">
                 <label>Producto a Vender:</label>
@@ -637,7 +643,6 @@
             </button>
         </form>
 
-        <!-- FORMULARIO GASTO -->
         <form id="formGasto" onsubmit="registrarGasto(event)" style="display: none;">
             <div class="form-group">
                 <label>Concepto o Descripción del Gasto:</label>
@@ -656,13 +661,11 @@
 
         <hr style="border-color: rgba(255,255,255,0.08); margin: 20px 0;">
 
-        <!-- Gráfico del Balance General -->
         <h3 style="font-size:0.95rem; color:#e5e7eb;"><i class="fa-solid fa-chart-pie"></i> Balance de Ingresos vs Gastos</h3>
         <div class="chart-container" style="max-width: 320px; margin: 10px auto;">
             <canvas id="chartBalance"></canvas>
         </div>
 
-        <!-- Historiales Resumidos -->
         <h3 style="margin-top: 20px; font-size:0.95rem; color:#e5e7eb;"><i class="fa-solid fa-clock-rotate-left"></i> Últimos Movimientos</h3>
         <div style="overflow-x: auto;">
             <table>
@@ -672,6 +675,7 @@
                         <th>Fecha</th>
                         <th>Detalle</th>
                         <th>Monto</th>
+                        <th>Acción</th>
                     </tr>
                 </thead>
                 <tbody id="tablaMovimientos"></tbody>
@@ -679,8 +683,33 @@
         </div>
     </section>
 
+    <!-- SDKs de Firebase (Realtime Database) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
     <script>
-        // Productos empezando desde 0
+        // CONFIGURACIÓN DE FIREBASE (Sincronización en la Nube Multi-dispositivo)
+        // INSTRUCCIÓN: Crea un proyecto gratuito en firebase.google.com, activa "Realtime Database" 
+        // y pega tus credenciales abajo para que se sincronice en tiempo real entre tus teléfonos.
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "tu-proyecto.firebaseapp.com",
+            databaseURL: "https://tu-proyecto-default-rtdb.firebaseio.com",
+            projectId: "tu-proyecto",
+            storageBucket: "tu-proyecto.appspot.com",
+            messagingSenderId: "tu-id",
+            appId: "tu-id"
+        };
+
+        // Si Firebase está configurado, usa la nube; si no, opera de respaldo local temporal.
+        let usaFirebase = false;
+        try {
+            if (firebaseConfig.apiKey !== "TU_API_KEY") {
+                firebase.initializeApp(firebaseConfig);
+                usaFirebase = true;
+            }
+        } catch (e) { console.warn("Firebase no configurado, operando en modo local."); }
+
         const productosIniciales = [
             { id: 'tabla_encofrado', nombre: 'Tabla de encofrado', requiereMedida: false, stock: 0, capacidadMax: 150 },
             { id: 'guaduas', nombre: 'Guaduas', requiereMedida: false, stock: 0, capacidadMax: 150 },
@@ -702,25 +731,51 @@
         let chartBalanceInstance = null;
 
         document.addEventListener('DOMContentLoaded', () => {
+            if (usaFirebase) {
+                const dbRef = firebase.database().ref('maderas_imbabura_data');
+                dbRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        inventario = data.inventario || productosIniciales;
+                        ventas = data.ventas || [];
+                        gastos = data.gastos || [];
+                        sincronizarUICompleta();
+                    }
+                });
+            } else {
+                sincronizarUICompleta();
+            }
+        });
+
+        function sincronizarUICompleta() {
             poblarSelectores();
             renderInventario();
             renderMovimientos();
             actualizarMetricas();
             actualizarGraficos();
-        });
+        }
 
         function guardarTodo() {
+            // Guardar localmente siempre
             localStorage.setItem('mi_inventario_3d', JSON.stringify(inventario));
             localStorage.setItem('mi_ventas_3d', JSON.stringify(ventas));
             localStorage.setItem('mi_gastos_3d', JSON.stringify(gastos));
-            actualizarMetricas();
-            actualizarGraficos();
+
+            // Si Firebase está configurado, sube los cambios a la nube en tiempo real para todos los teléfonos
+            if (usaFirebase) {
+                firebase.database().ref('maderas_imbabura_data').set({
+                    inventario: inventario,
+                    ventas: ventas,
+                    gastos: gastos
+                });
+            }
+
+            sincronizarUICompleta();
         }
 
         function showSection(sectionId, btnElem) {
             document.querySelectorAll('.section-card').forEach(sec => sec.classList.remove('active-section'));
             document.querySelectorAll('.btn-nav-pill').forEach(btn => btn.classList.remove('active'));
-            
             document.getElementById(`sec-${sectionId}`).classList.add('active-section');
             btnElem.classList.add('active');
         }
@@ -768,7 +823,7 @@
             const etiqueta = document.getElementById('nuevaEtiquetaMedida').value.trim() || 'Medida:';
 
             inventario.push({
-                id: 'prod_' + Date.now(),
+                id: 'prod_' + Date.now() + Math.random().toString(36).substr(2, 5),
                 nombre: nombre,
                 requiereMedida: reqMedida,
                 etiquetaMedida: etiqueta,
@@ -777,10 +832,15 @@
             });
 
             guardarTodo();
-            poblarSelectores();
-            renderInventario();
             document.getElementById('formNuevoProducto').reset();
             toggleMedidaEtiqueta();
+        }
+
+        function eliminarProducto(id) {
+            if (confirm("¿Estás seguro de eliminar este producto del inventario?")) {
+                inventario = inventario.filter(p => p.id !== id);
+                guardarTodo();
+            }
         }
 
         function calcularTotalCompra() {
@@ -844,14 +904,13 @@
                 if (prod.stock > prod.capacidadMax) prod.capacidadMax = Math.ceil(prod.stock * 1.2);
 
                 gastos.push({
+                    id: 'g_' + Date.now(),
                     fecha: new Date().toLocaleDateString(),
                     descripcion: `Compra ${cantidad}u. ${prod.nombre}` + (medida ? ` (${medida})` : ''),
                     monto: costo
                 });
 
                 guardarTodo();
-                renderInventario();
-                renderMovimientos();
                 document.getElementById('formInventario').reset();
                 document.getElementById('costoCompra').value = '';
             }
@@ -875,15 +934,15 @@
                 prod.stock -= cantidad;
 
                 ventas.push({
+                    id: 'v_' + Date.now(),
                     fecha: new Date().toLocaleDateString(),
+                    productoId: prod.id,
                     productoNombre: prod.nombre + (medida ? ` (${medida})` : ''),
                     cantidad: cantidad,
                     total: precioTotal
                 });
 
                 guardarTodo();
-                renderInventario();
-                renderMovimientos();
                 document.getElementById('formVenta').reset();
                 document.getElementById('precioVenta').value = '';
                 if (typeof confetti === 'function') confetti({ particleCount: 50, spread: 60 });
@@ -896,38 +955,44 @@
             const monto = parseFloat(document.getElementById('montoGasto').value);
 
             gastos.push({
+                id: 'g_' + Date.now(),
                 fecha: new Date().toLocaleDateString(),
                 descripcion: desc,
                 monto: monto
             });
 
             guardarTodo();
-            renderMovimientos();
             document.getElementById('formGasto').reset();
         }
 
-        /* LÓGICA DE COLOR ESCALABLE DE PRODUCTOS (0 a 10+, 50+, 100+) */
+        function eliminarVenta(id) {
+            if (confirm("¿Estás seguro de eliminar este registro de venta?")) {
+                ventas = ventas.filter(v => v.id !== id);
+                guardarTodo();
+            }
+        }
+
+        function eliminarGasto(id) {
+            if (confirm("¿Estás seguro de eliminar este registro de gasto?")) {
+                gastos = gastos.filter(g => g.id !== id);
+                guardarTodo();
+            }
+        }
+
         function obtenerEstiloBarra(cantidad, capacidadMax) {
             let porcentaje = Math.min(100, Math.max(0, (cantidad / capacidadMax) * 100));
-            // Si el stock sobrepasa 100u, forzamos visibilidad de barra completa
             if (cantidad >= 100) porcentaje = 100;
 
             let background = '';
-
             if (cantidad < 10) {
-                // Menos de 10 unidades: ROJO / ALERTA CRÍTICA
                 background = 'linear-gradient(90deg, #ef4444, #f87171)';
             } else if (cantidad >= 10 && cantidad < 50) {
-                // De 10 a 49 unidades: AMARILLO OSCURO / NARANJA
                 background = 'linear-gradient(90deg, #d97706, #f59e0b)';
             } else if (cantidad >= 50 && cantidad < 100) {
-                // De 50 a 99 unidades: TRANSICIÓN A VERDE
                 background = 'linear-gradient(90deg, #84cc16, #10b981)';
             } else {
-                // 100 o más unidades: VERDE BRILLANTE / ESMERALDA
                 background = 'linear-gradient(90deg, #10b981, #34d399)';
             }
-
             return { porcentaje, background };
         }
 
@@ -937,21 +1002,22 @@
 
             inventario.forEach(prod => {
                 const estilo = obtenerEstiloBarra(prod.stock, prod.capacidadMax);
-
                 const card = document.createElement('div');
                 card.className = 'product-card-3d';
                 
                 card.innerHTML = `
+                    <button class="btn-delete-prod" onclick="eliminarProducto('${prod.id}')" title="Eliminar producto">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
                     <div class="product-title">
-                        ${prod.nombre}
-                        <span class="product-badge">${prod.requiereMedida ? 'Medida' : 'Estándar'}</span>
+                        <span>${prod.nombre}</span>
                     </div>
+                    <div style="margin-top:2px;"><span class="product-badge">${prod.requiereMedida ? 'Medida' : 'Estándar'}</span></div>
                     <div class="product-qty">${prod.stock} <span>unidades</span></div>
                     <div class="bar-container-3d">
                         <div class="bar-fill-3d" style="width: ${estilo.porcentaje}%; background: ${estilo.background};"></div>
                     </div>
                 `;
-
                 container.appendChild(card);
             });
         }
@@ -960,10 +1026,9 @@
             const tbody = document.getElementById('tablaMovimientos');
             tbody.innerHTML = '';
 
-            // Combinar Ventas y Gastos
             const lista = [];
-            ventas.forEach(v => lista.push({ tipo: 'VENTA', fecha: v.fecha, detalle: `${v.productoNombre} (x${v.cantidad})`, monto: v.total }));
-            gastos.forEach(g => lista.push({ tipo: 'GASTO', fecha: g.fecha, detalle: g.descripcion, monto: g.monto }));
+            ventas.forEach(v => lista.push({ tipo: 'VENTA', id: v.id, fecha: v.fecha, detalle: `${v.productoNombre} (x${v.cantidad})`, monto: v.total }));
+            gastos.forEach(g => lista.push({ tipo: 'GASTO', id: g.id, fecha: g.fecha, detalle: g.descripcion, monto: g.monto }));
 
             lista.slice(-10).reverse().forEach(item => {
                 const esVenta = item.tipo === 'VENTA';
@@ -973,6 +1038,11 @@
                         <td>${item.fecha}</td>
                         <td>${item.detalle}</td>
                         <td style="font-weight:700;">${esVenta ? '+' : '-'}$${item.monto.toFixed(2)}</td>
+                        <td>
+                            <button class="btn-delete-row" onclick="${esVenta ? `eliminarVenta('${item.id}')` : `eliminarGasto('${item.id}')`}">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
                     </tr>
                 `;
             });
@@ -1030,9 +1100,6 @@
                         ventas = datos.ventas;
                         gastos = datos.gastos;
                         guardarTodo();
-                        poblarSelectores();
-                        renderInventario();
-                        renderMovimientos();
                     } else {
                         alert("⚠️ Archivo no compatible.");
                     }
