@@ -307,7 +307,6 @@
             margin-top: 12px;
         }
 
-        /* Casilla de Producto con Mover/Drag */
         .product-card-3d {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -317,7 +316,6 @@
             position: relative;
             cursor: grab;
             user-select: none;
-            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .product-card-3d:active {
@@ -336,7 +334,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding-right: 22px;
+            padding-right: 48px;
         }
 
         .drag-handle {
@@ -346,19 +344,28 @@
             cursor: grab;
         }
 
-        .btn-delete-prod {
+        .card-actions {
             position: absolute;
             top: 10px;
             right: 10px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-action-card {
             background: none;
             border: none;
             color: var(--text-muted);
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             transition: color 0.2s;
         }
 
-        .btn-delete-prod:hover {
+        .btn-action-card.edit:hover {
+            color: #38bdf8;
+        }
+
+        .btn-action-card.delete:hover {
             color: var(--danger-red);
         }
 
@@ -644,12 +651,12 @@
 
         <h3 style="font-size:0.95rem; margin-top:15px; color:#e5e7eb; display: flex; justify-content: space-between; align-items: center;">
             <span>Estado Actual del Stock</span>
-            <small style="color: var(--text-muted); font-weight: normal; font-size: 0.75rem;">💡 Manten presionada una casilla para arrastrar y reordenar</small>
+            <small style="color: var(--text-muted); font-weight: normal; font-size: 0.75rem;">💡 Arrastra la casilla para ordenar</small>
         </h3>
         <div id="gridInventario" class="inventory-grid"></div>
     </section>
 
-    <!-- SECCIÓN FUSIONADA: VENTAS Y GASTOS -->
+    <!-- SECCIÓN REGISTRO -->
     <section id="sec-registro" class="section-card">
         <h2><i class="fa-solid fa-cash-register"></i> Registro Unificado de Operaciones</h2>
 
@@ -840,7 +847,6 @@
             sincronizarUICompleta();
         }
 
-        // Configuración de SortableJS para arrastrar tarjetas
         function inicializarDragAndDrop() {
             const grid = document.getElementById('gridInventario');
             if (!grid) return;
@@ -850,10 +856,9 @@
             sortableInstance = new Sortable(grid, {
                 animation: 200,
                 ghostClass: 'sortable-ghost',
-                delay: 150, // Pequeño retraso para toque prolongado en móviles
+                delay: 150,
                 delayOnTouchOnly: true,
                 onEnd: function (evt) {
-                    // Reordenar array de inventario tras mover casilla
                     const movedItem = inventario.splice(evt.oldIndex, 1)[0];
                     inventario.splice(evt.newIndex, 0, movedItem);
                     guardarTodo();
@@ -930,6 +935,30 @@
             document.getElementById('formNuevoProducto').reset();
             toggleMedidaEtiqueta();
             mostrarNotificacion(`Nuevo producto agregado: ${nombre}`);
+        }
+
+        // Función para editar un producto existente
+        function editarProducto(id) {
+            const prod = inventario.find(p => p.id === id);
+            if (!prod) return;
+
+            const nuevoNombre = prompt("Editar nombre del producto:", prod.nombre);
+            if (nuevoNombre === null) return; // Cancelado
+
+            const nuevoStockStr = prompt("Editar cantidad en stock (unidades):", prod.stock);
+            if (nuevoStockStr === null) return;
+
+            const nuevoStock = parseInt(nuevoStockStr);
+            if (isNaN(nuevoStock) || nuevoStock < 0) {
+                alert("⚠️ Cantidad no válida.");
+                return;
+            }
+
+            prod.nombre = nuevoNombre.trim() || prod.nombre;
+            prod.stock = nuevoStock;
+
+            guardarTodo();
+            mostrarNotificacion(`Producto actualizado: ${prod.nombre}`);
         }
 
         function eliminarProducto(id) {
@@ -1132,9 +1161,14 @@
                 card.setAttribute('data-id', prod.id);
                 
                 card.innerHTML = `
-                    <button class="btn-delete-prod" onclick="eliminarProducto('${prod.id}')" title="Eliminar producto">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
+                    <div class="card-actions">
+                        <button class="btn-action-card edit" onclick="editarProducto('${prod.id}')" title="Editar producto">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button class="btn-action-card delete" onclick="eliminarProducto('${prod.id}')" title="Eliminar producto">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
                     <div class="product-title">
                         <span><i class="fa-solid fa-grip-vertical drag-handle"></i> ${prod.nombre}</span>
                     </div>
