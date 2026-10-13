@@ -937,28 +937,33 @@
             mostrarNotificacion(`Nuevo producto agregado: ${nombre}`);
         }
 
-        // Función para editar un producto existente
+        // Función para editar tanto el nombre como el stock del producto
         function editarProducto(id) {
             const prod = inventario.find(p => p.id === id);
             if (!prod) return;
 
             const nuevoNombre = prompt("Editar nombre del producto:", prod.nombre);
-            if (nuevoNombre === null) return; // Cancelado
+            if (nuevoNombre === null) return; // Si cancela
 
-            const nuevoStockStr = prompt("Editar cantidad en stock (unidades):", prod.stock);
-            if (nuevoStockStr === null) return;
+            const nuevoStockStr = prompt(`Editar cantidad en stock para "${prod.nombre}":`, prod.stock);
+            if (nuevoStockStr === null) return; // Si cancela
 
             const nuevoStock = parseInt(nuevoStockStr);
             if (isNaN(nuevoStock) || nuevoStock < 0) {
-                alert("⚠️ Cantidad no válida.");
+                alert("⚠️ La cantidad ingresada no es válida.");
                 return;
             }
 
             prod.nombre = nuevoNombre.trim() || prod.nombre;
             prod.stock = nuevoStock;
 
+            // Ajustar capacidad máxima si el stock supera el límite actual
+            if (prod.stock > prod.capacidadMax) {
+                prod.capacidadMax = Math.ceil(prod.stock * 1.2);
+            }
+
             guardarTodo();
-            mostrarNotificacion(`Producto actualizado: ${prod.nombre}`);
+            mostrarNotificacion(`¡Actualizado! ${prod.nombre} ahora tiene ${prod.stock} u.`);
         }
 
         function eliminarProducto(id) {
@@ -1162,7 +1167,7 @@
                 
                 card.innerHTML = `
                     <div class="card-actions">
-                        <button class="btn-action-card edit" onclick="editarProducto('${prod.id}')" title="Editar producto">
+                        <button class="btn-action-card edit" onclick="editarProducto('${prod.id}')" title="Editar producto y unidades">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
                         <button class="btn-action-card delete" onclick="eliminarProducto('${prod.id}')" title="Eliminar producto">
