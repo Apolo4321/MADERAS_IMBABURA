@@ -1,1 +1,1341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MADERAS IMBABURA</title>
 
+    <!-- FontAwesome para íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js para gráficos dinámicos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Canvas-Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- SortableJS para arrastrar y reordenar casillas -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <!-- Google Fonts Outfit & Inter -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap">
+
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0b170e 0%, #132a1a 50%, #060d07 100%);
+            --glass-card: rgba(18, 38, 23, 0.65);
+            --emerald-bright: #10b981;
+            --emerald-glow: rgba(16, 185, 129, 0.35);
+            --wood-gold: #f59e0b;
+            --danger-red: #ef4444;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+            --shadow-3d: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 12px 10px 30px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 12px;
+            padding: 10px 15px;
+            background: var(--glass-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-3d);
+        }
+
+        header h1 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #ffffff 0%, #a7f3d0 60%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+
+        .backup-bar {
+            background: rgba(245, 158, 11, 0.06);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            backdrop-filter: blur(8px);
+            padding: 8px 12px;
+            border-radius: var(--radius-md);
+            margin-bottom: 12px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .backup-bar-text {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .backup-bar-text i {
+            color: var(--wood-gold);
+            font-size: 0.95rem;
+        }
+
+        .btn-mini {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            color: #fef3c7;
+            padding: 5px 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-mini:hover {
+            background: rgba(245, 158, 11, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .main-nav {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .btn-nav-pill {
+            background: var(--glass-card);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-muted);
+            padding: 10px 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: var(--shadow-3d);
+        }
+
+        .btn-nav-pill.active {
+            color: white;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(5, 150, 105, 0.6) 100%);
+            border: 1px solid var(--emerald-bright);
+            box-shadow: 0 4px 15px var(--emerald-glow);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .metric-card {
+            background: var(--glass-card);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 10px;
+            border-radius: var(--radius-md);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .metric-info p {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .metric-info h3 {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: white;
+            margin-top: 2px;
+        }
+
+        .metric-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .section-card {
+            background: var(--glass-card);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 16px;
+            border-radius: var(--radius-lg);
+            backdrop-filter: blur(14px);
+            box-shadow: var(--shadow-3d);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .section-card.active-section {
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 8px;
+        }
+
+        .form-glass-container {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 14px;
+            border-radius: var(--radius-md);
+            margin-bottom: 15px;
+        }
+
+        .form-glass-container h3 {
+            font-size: 0.95rem;
+            color: #a7f3d0;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media (max-width: 500px) {
+            .form-row { grid-template-columns: 1fr; }
+            .metrics-grid { grid-template-columns: 1fr; }
+            .main-nav { grid-template-columns: 1fr; }
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+            color: #e5e7eb;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 8px 10px;
+            font-size: 0.88rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            color: white;
+            outline: none;
+        }
+
+        select option {
+            background: #122818;
+            color: white;
+        }
+
+        input[readonly] {
+            background: rgba(16, 185, 129, 0.08);
+            border-color: rgba(16, 185, 129, 0.25);
+            color: #a7f3d0;
+            font-weight: 700;
+        }
+
+        button.btn-submit {
+            background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+            border: 1px solid var(--emerald-bright);
+            color: white;
+            padding: 10px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-radius: 8px;
+            width: 100%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .product-card-3d {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: relative;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .product-card-3d:active {
+            cursor: grabbing;
+        }
+
+        .sortable-ghost {
+            opacity: 0.4;
+            border: 1px dashed var(--emerald-bright);
+        }
+
+        .product-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-right: 48px;
+        }
+
+        .drag-handle {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-right: 6px;
+            cursor: grab;
+        }
+
+        .card-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-action-card {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: color 0.2s;
+        }
+
+        .btn-action-card.edit:hover {
+            color: #38bdf8;
+        }
+
+        .btn-action-card.delete:hover {
+            color: var(--danger-red);
+        }
+
+        .product-badge {
+            font-size: 0.68rem;
+            padding: 2px 6px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.08);
+            color: var(--text-muted);
+        }
+
+        .product-qty {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 6px 0 2px;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .product-qty span {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+        .bar-container-3d {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .bar-fill-3d {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease, background 0.4s ease;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.82rem;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--emerald-bright);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.72rem;
+        }
+
+        .btn-delete-row {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+            padding: 3px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .btn-delete-row:hover {
+            background: rgba(239, 68, 68, 0.4);
+        }
+
+        .chart-container {
+            position: relative;
+            max-height: 220px;
+            margin-top: 12px;
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: var(--radius-md);
+        }
+
+        .type-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .type-toggle button {
+            flex: 1;
+            padding: 8px;
+            font-weight: 700;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.05);
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .type-toggle button.active-venta {
+            background: rgba(16, 185, 129, 0.25);
+            border-color: var(--emerald-bright);
+            color: #a7f3d0;
+        }
+
+        .type-toggle button.active-gasto {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: var(--danger-red);
+            color: #fca5a5;
+        }
+
+        #toastNotif {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(16, 185, 129, 0.95);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid #34d399;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><i class="fa-solid fa-tree"></i> MADERAS IMBABURA</h1>
+    </header>
+
+    <div class="backup-bar">
+        <div class="backup-bar-text">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Sincronización en la Nube Activa</span>
+        </div>
+        <div style="display: flex; gap: 6px;">
+            <button class="btn-mini" onclick="exportarDatos()">
+                <i class="fa-solid fa-download"></i> Copia JSON
+            </button>
+            <button class="btn-mini" style="background: rgba(2, 136, 209, 0.2); border-color: #0288d1;" onclick="document.getElementById('inputImportar').click()">
+                <i class="fa-solid fa-upload"></i> Restaurar
+            </button>
+            <input type="file" id="inputImportar" style="display:none;" accept=".json" onchange="importarDatos(event)">
+        </div>
+    </div>
+
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-info">
+                <p>Stock Total</p>
+                <h3 id="statTotalStock">0 u.</h3>
+            </div>
+            <div class="metric-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+                <i class="fa-solid fa-boxes-stacked"></i>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-info">
+                <p>Ingresos</p>
+                <h3 id="statTotalVentas">$0.00</h3>
+            </div>
+            <div class="metric-icon" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-info">
+                <p>Gastos</p>
+                <h3 id="statTotalGastos">$0.00</h3>
+            </div>
+            <div class="metric-icon" style="background: rgba(239, 68, 68, 0.15); color: #f87171;">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+        </div>
+    </div>
+
+    <nav class="main-nav">
+        <button class="btn-nav-pill active" onclick="showSection('inventario', this)">
+            <i class="fa-solid fa-box-archive"></i> INVENTARIO
+        </button>
+        <button class="btn-nav-pill" onclick="showSection('registro', this)">
+            <i class="fa-solid fa-scale-balanced"></i> REGISTRO
+        </button>
+        <button class="btn-nav-pill" onclick="showSection('analisis', this)">
+            <i class="fa-solid fa-chart-line"></i> ANÁLISIS
+        </button>
+    </nav>
+
+    <!-- SECCIÓN INVENTARIO -->
+    <section id="sec-inventario" class="section-card active-section">
+        <h2><i class="fa-solid fa-cubes"></i> Control e Ingreso de Inventario</h2>
+
+        <div class="form-glass-container">
+            <h3><i class="fa-solid fa-plus-circle"></i> Nuevo Producto en Catálogo</h3>
+            <form id="formNuevoProducto" onsubmit="crearNuevoProducto(event)">
+                <div class="form-group">
+                    <label>Nombre del Producto:</label>
+                    <input type="text" id="nuevoNombreProd" required placeholder="Ej: Tablas de eucalipto">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Stock Inicial (Unidades):</label>
+                        <input type="number" id="nuevoStockProd" min="0" value="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Capacidad Máxima (Barra):</label>
+                        <input type="number" id="nuevoMaxProd" min="1" value="100" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>¿Requiere Medida Especial?</label>
+                    <select id="nuevoRequiereMedida" onchange="toggleMedidaEtiqueta()">
+                        <option value="false">No (Estándar)</option>
+                        <option value="true">Sí (Largo, ancho o notas)</option>
+                    </select>
+                </div>
+
+                <div id="boxEtiquetaMedida" class="form-group" style="display:none;">
+                    <label>Detalle o Instrucción:</label>
+                    <input type="text" id="nuevaEtiquetaMedida" placeholder="Ej: Largo en metros">
+                </div>
+
+                <button type="submit" class="btn-submit" style="background: linear-gradient(135deg, #0288d1 0%, #01579b 100%);">
+                    <i class="fa-solid fa-plus"></i> Guardar Producto
+                </button>
+            </form>
+        </div>
+
+        <div class="form-glass-container">
+            <h3><i class="fa-solid fa-truck-ramp-box"></i> Registrar Compra (Reabastecer)</h3>
+            <form id="formInventario" onsubmit="registrarCompra(event)">
+                <div class="form-group">
+                    <label>Producto:</label>
+                    <select id="prodCompra" onchange="toggleMedidas('compra')" required></select>
+                </div>
+
+                <div id="medidasCompra" style="display:none;" class="form-group">
+                    <label id="lblMedidaCompra">Medida / Especificación:</label>
+                    <input type="text" id="txtMedidaCompra" placeholder="Ej: 3 metros de largo">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cantidad Comprada:</label>
+                        <input type="number" id="cantCompra" min="1" required placeholder="Ej: 50" oninput="calcularTotalCompra()">
+                    </div>
+                    <div class="form-group">
+                        <label>Costo Unitario ($):</label>
+                        <input type="number" step="0.01" id="precioUnitarioCompra" min="0" required placeholder="Ej: 2.20" oninput="calcularTotalCompra()">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Costo Total ($):</label>
+                    <input type="number" step="0.01" id="costoCompra" readonly placeholder="Calculado automáticamente">
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-cart-plus"></i> Ingresar al Inventario
+                </button>
+            </form>
+        </div>
+
+        <h3 style="font-size:0.95rem; margin-top:15px; color:#e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+            <span>Estado Actual del Stock</span>
+            <small style="color: var(--text-muted); font-weight: normal; font-size: 0.75rem;">💡 Arrastra la casilla para ordenar</small>
+        </h3>
+        <div id="gridInventario" class="inventory-grid"></div>
+    </section>
+
+    <!-- SECCIÓN REGISTRO -->
+    <section id="sec-registro" class="section-card">
+        <h2><i class="fa-solid fa-cash-register"></i> Registro Unificado de Operaciones</h2>
+
+        <div class="type-toggle">
+            <button id="btnModoVenta" class="active-venta" onclick="setModoRegistro('venta')">
+                <i class="fa-solid fa-sack-dollar"></i> REGISTRAR VENTA
+            </button>
+            <button id="btnModoGasto" onclick="setModoRegistro('gasto')">
+                <i class="fa-solid fa-receipt"></i> REGISTRAR GASTO
+            </button>
+        </div>
+
+        <form id="formVenta" onsubmit="registrarVenta(event)">
+            <div class="form-group">
+                <label>Producto a Vender:</label>
+                <select id="prodVenta" onchange="toggleMedidas('venta')" required></select>
+            </div>
+
+            <div id="medidasVenta" style="display:none;" class="form-group">
+                <label id="lblMedidaVenta">Medida:</label>
+                <input type="text" id="txtMedidaVenta" placeholder="Ej: Corte especial 2.5m">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Cantidad Vendida:</label>
+                    <input type="number" id="cantVenta" min="1" required placeholder="Ej: 10" oninput="calcularTotalVenta()">
+                </div>
+                <div class="form-group">
+                    <label>Precio Unitario Cobrado ($):</label>
+                    <input type="number" step="0.01" id="precioUnitarioVenta" min="0" required placeholder="Ej: 3.50" oninput="calcularTotalVenta()">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Monto Total ($):</label>
+                <input type="number" step="0.01" id="precioVenta" readonly placeholder="Total en tiempo real">
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fa-solid fa-check"></i> Finalizar y Cobrar Venta
+            </button>
+        </form>
+
+        <form id="formGasto" onsubmit="registrarGasto(event)" style="display: none;">
+            <div class="form-group">
+                <label>Concepto o Descripción del Gasto:</label>
+                <input type="text" id="descGasto" required placeholder="Ej: Combustible, herramientas, transporte">
+            </div>
+
+            <div class="form-group">
+                <label>Monto Pagado ($):</label>
+                <input type="number" step="0.01" id="montoGasto" min="0" required placeholder="Ej: 45.00">
+            </div>
+
+            <button type="submit" class="btn-submit" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); border-color: #f87171;">
+                <i class="fa-solid fa-minus-circle"></i> Registrar Gasto Operativo
+            </button>
+        </form>
+
+        <hr style="border-color: rgba(255,255,255,0.08); margin: 20px 0;">
+
+        <h3 style="font-size:0.95rem; color:#e5e7eb;"><i class="fa-solid fa-chart-pie"></i> Balance de Ingresos vs Gastos</h3>
+        <div class="chart-container" style="max-width: 320px; margin: 10px auto;">
+            <canvas id="chartBalance"></canvas>
+        </div>
+
+        <h3 style="margin-top: 20px; font-size:0.95rem; color:#e5e7eb;"><i class="fa-solid fa-clock-rotate-left"></i> Últimos Movimientos</h3>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Fecha</th>
+                        <th>Detalle</th>
+                        <th>Monto</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaMovimientos"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- SECCIÓN ANÁLISIS DE VENTAS -->
+    <section id="sec-analisis" class="section-card">
+        <h2><i class="fa-solid fa-chart-line"></i> Análisis de Ventas y Estacionalidad</h2>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">
+            Clasificación de productos del más vendido al menos vendido y análisis de épocas de mayor demanda.
+        </p>
+
+        <div id="contenedorRanking" style="display: flex; flex-direction: column; gap: 10px;"></div>
+    </section>
+
+    <div id="toastNotif"></div>
+
+    <!-- SDKs de Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCF4_W4tVEzjjFP1E_BOqV4HKXFD3LCPGs",
+            authDomain: "maderas-imbabura.firebaseapp.com",
+            databaseURL: "https://maderas-imbabura-default-rtdb.firebaseio.com",
+            projectId: "maderas-imbabura",
+            storageBucket: "maderas-imbabura.firebasestorage.app",
+            messagingSenderId: "64736849626",
+            appId: "1:64736849626:web:e58a75ab812caf6df3bfe3"
+        };
+
+        let usaFirebase = false;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            usaFirebase = true;
+        } catch (e) { 
+            console.warn("Error con Firebase, operando en modo local.", e); 
+        }
+
+        const productosIniciales = [
+            { id: 'tabla_encofrado', nombre: 'Tabla de encofrado', requiereMedida: false, stock: 0, capacidadMax: 150 },
+            { id: 'guaduas', nombre: 'Guaduas', requiereMedida: false, stock: 0, capacidadMax: 150 },
+            { id: 'rieles', nombre: 'Rieles', requiereMedida: false, stock: 0, capacidadMax: 120 },
+            { id: 'cuartones', nombre: 'Cuartones', requiereMedida: true, etiquetaMedida: 'Medidas:', stock: 0, capacidadMax: 120 },
+            { id: 'pingos', nombre: 'Pingos', requiereMedida: true, etiquetaMedida: 'Largo:', stock: 0, capacidadMax: 150 },
+            { id: 'tirantes', nombre: 'Tirantes', requiereMedida: true, etiquetaMedida: 'Medida:', stock: 0, capacidadMax: 100 },
+            { id: 'costaneras', nombre: 'Costanera', requiereMedida: true, etiquetaMedida: 'Medida:', stock: 0, capacidadMax: 100 },
+            { id: 'cuadrados', nombre: 'Cuadrados', requiereMedida: true, etiquetaMedida: 'Medida:', stock: 0, capacidadMax: 100 },
+            { id: 'estacas', nombre: 'Estacas', requiereMedida: false, stock: 0, capacidadMax: 200 },
+            { id: 'guangos_lena', nombre: 'Guangos de leña', requiereMedida: false, stock: 0, capacidadMax: 100 },
+            { id: 'vigas', nombre: 'Vigas', requiereMedida: true, etiquetaMedida: 'Medida:', stock: 0, capacidadMax: 100 }
+        ];
+
+        let inventario = productosIniciales;
+        let ventas = [];
+        let gastos = [];
+        let chartBalanceInstance = null;
+        let sortableInstance = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (usaFirebase) {
+                const dbRef = firebase.database().ref('maderas_imbabura_data');
+                dbRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data && data.inventario) {
+                        inventario = data.inventario;
+                        ventas = data.ventas || [];
+                        gastos = data.gastos || [];
+                    } else {
+                        inventario = productosIniciales;
+                        ventas = [];
+                        gastos = [];
+                        guardarTodo();
+                    }
+                    sincronizarUICompleta();
+                });
+            } else {
+                inventario = JSON.parse(localStorage.getItem('mi_inventario_3d')) || productosIniciales;
+                ventas = JSON.parse(localStorage.getItem('mi_ventas_3d')) || [];
+                gastos = JSON.parse(localStorage.getItem('mi_gastos_3d')) || [];
+                sincronizarUICompleta();
+            }
+        });
+
+        function sincronizarUICompleta() {
+            poblarSelectores();
+            renderInventario();
+            renderMovimientos();
+            actualizarMetricas();
+            actualizarGraficos();
+            renderAnalisis();
+            inicializarDragAndDrop();
+        }
+
+        function guardarTodo() {
+            localStorage.setItem('mi_inventario_3d', JSON.stringify(inventario));
+            localStorage.setItem('mi_ventas_3d', JSON.stringify(ventas));
+            localStorage.setItem('mi_gastos_3d', JSON.stringify(gastos));
+
+            if (usaFirebase) {
+                firebase.database().ref('maderas_imbabura_data').set({
+                    inventario: inventario,
+                    ventas: ventas,
+                    gastos: gastos
+                });
+            }
+
+            sincronizarUICompleta();
+        }
+
+        function inicializarDragAndDrop() {
+            const grid = document.getElementById('gridInventario');
+            if (!grid) return;
+
+            if (sortableInstance) sortableInstance.destroy();
+
+            sortableInstance = new Sortable(grid, {
+                animation: 200,
+                ghostClass: 'sortable-ghost',
+                delay: 150,
+                delayOnTouchOnly: true,
+                onEnd: function (evt) {
+                    const movedItem = inventario.splice(evt.oldIndex, 1)[0];
+                    inventario.splice(evt.newIndex, 0, movedItem);
+                    guardarTodo();
+                }
+            });
+        }
+
+        function showSection(sectionId, btnElem) {
+            document.querySelectorAll('.section-card').forEach(sec => sec.classList.remove('active-section'));
+            document.querySelectorAll('.btn-nav-pill').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`sec-${sectionId}`).classList.add('active-section');
+            btnElem.classList.add('active');
+        }
+
+        function setModoRegistro(modo) {
+            const btnVenta = document.getElementById('btnModoVenta');
+            const btnGasto = document.getElementById('btnModoGasto');
+            const formVenta = document.getElementById('formVenta');
+            const formGasto = document.getElementById('formGasto');
+
+            if (modo === 'venta') {
+                btnVenta.className = 'active-venta';
+                btnGasto.className = '';
+                formVenta.style.display = 'block';
+                formGasto.style.display = 'none';
+            } else {
+                btnVenta.className = '';
+                btnGasto.className = 'active-gasto';
+                formVenta.style.display = 'none';
+                formGasto.style.display = 'block';
+            }
+        }
+
+        function mostrarNotificacion(texto) {
+            const toast = document.getElementById('toastNotif');
+            toast.innerHTML = `<i class="fa-solid fa-bell"></i> ${texto}`;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 4000);
+        }
+
+        function actualizarMetricas() {
+            const totalStock = inventario.reduce((acc, p) => acc + (p.stock || 0), 0);
+            const totalVentas = ventas.reduce((acc, v) => acc + (v.total || 0), 0);
+            const totalGastos = gastos.reduce((acc, g) => acc + (g.monto || 0), 0);
+
+            document.getElementById('statTotalStock').textContent = totalStock + ' u.';
+            document.getElementById('statTotalVentas').textContent = '$' + totalVentas.toFixed(2);
+            document.getElementById('statTotalGastos').textContent = '$' + totalGastos.toFixed(2);
+        }
+
+        function toggleMedidaEtiqueta() {
+            const req = document.getElementById('nuevoRequiereMedida').value;
+            document.getElementById('boxEtiquetaMedida').style.display = (req === 'true') ? 'block' : 'none';
+        }
+
+        function crearNuevoProducto(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('nuevoNombreProd').value.trim();
+            const stock = parseInt(document.getElementById('nuevoStockProd').value) || 0;
+            const max = parseInt(document.getElementById('nuevoMaxProd').value) || 100;
+            const reqMedida = document.getElementById('nuevoRequiereMedida').value === 'true';
+            const etiqueta = document.getElementById('nuevaEtiquetaMedida').value.trim() || 'Medida:';
+
+            inventario.push({
+                id: 'prod_' + Date.now() + Math.random().toString(36).substr(2, 5),
+                nombre: nombre,
+                requiereMedida: reqMedida,
+                etiquetaMedida: etiqueta,
+                stock: stock,
+                capacidadMax: max
+            });
+
+            guardarTodo();
+            document.getElementById('formNuevoProducto').reset();
+            toggleMedidaEtiqueta();
+            mostrarNotificacion(`Nuevo producto agregado: ${nombre}`);
+        }
+
+        // Función para editar tanto el nombre como las unidades (stock)
+        function editarProducto(id) {
+            const prod = inventario.find(p => p.id === id);
+            if (!prod) return;
+
+            const nuevoNombre = prompt("Editar nombre del producto:", prod.nombre);
+            if (nuevoNombre === null) return; // Si cancela
+
+            const nuevoStockStr = prompt(`Editar cantidad en stock para "${nuevoNombre.trim() || prod.nombre}":`, prod.stock);
+            if (nuevoStockStr === null) return; // Si cancela
+
+            const nuevoStock = parseInt(nuevoStockStr);
+            if (isNaN(nuevoStock) || nuevoStock < 0) {
+                alert("⚠️ La cantidad ingresada no es válida.");
+                return;
+            }
+
+            prod.nombre = nuevoNombre.trim() || prod.nombre;
+            prod.stock = nuevoStock;
+
+            if (prod.stock > prod.capacidadMax) {
+                prod.capacidadMax = Math.ceil(prod.stock * 1.2);
+            }
+
+            guardarTodo();
+            mostrarNotificacion(`¡Actualizado! ${prod.nombre} ahora tiene ${prod.stock} u.`);
+        }
+
+        function eliminarProducto(id) {
+            if (confirm("¿Estás seguro de eliminar este producto del inventario?")) {
+                inventario = inventario.filter(p => p.id !== id);
+                guardarTodo();
+            }
+        }
+
+        function calcularTotalCompra() {
+            const cant = parseFloat(document.getElementById('cantCompra').value) || 0;
+            const precioUnit = parseFloat(document.getElementById('precioUnitarioCompra').value) || 0;
+            document.getElementById('costoCompra').value = (cant * precioUnit).toFixed(2);
+        }
+
+        function calcularTotalVenta() {
+            const cant = parseFloat(document.getElementById('cantVenta').value) || 0;
+            const precioUnit = parseFloat(document.getElementById('precioUnitarioVenta').value) || 0;
+            document.getElementById('precioVenta').value = (cant * precioUnit).toFixed(2);
+        }
+
+        function poblarSelectores() {
+            const selectCompra = document.getElementById('prodCompra');
+            const selectVenta = document.getElementById('prodVenta');
+            if (!selectCompra || !selectVenta) return;
+
+            selectCompra.innerHTML = '';
+            selectVenta.innerHTML = '';
+
+            inventario.forEach(item => {
+                let opt1 = document.createElement('option');
+                opt1.value = item.id;
+                opt1.textContent = item.nombre;
+                selectCompra.appendChild(opt1);
+
+                let opt2 = document.createElement('option');
+                opt2.value = item.id;
+                opt2.textContent = item.nombre;
+                selectVenta.appendChild(opt2);
+            });
+
+            toggleMedidas('compra');
+            toggleMedidas('venta');
+        }
+
+        function toggleMedidas(tipo) {
+            const select = document.getElementById(tipo === 'compra' ? 'prodCompra' : 'prodVenta');
+            const box = document.getElementById(tipo === 'compra' ? 'medidasCompra' : 'medidasVenta');
+            const lbl = document.getElementById(tipo === 'compra' ? 'lblMedidaCompra' : 'lblMedidaVenta');
+
+            if (!select || !box) return;
+
+            const prod = inventario.find(p => p.id === select.value);
+            if (prod && prod.requiereMedida) {
+                box.style.display = 'block';
+                lbl.textContent = prod.etiquetaMedida || 'Medida Especificada:';
+            } else {
+                box.style.display = 'none';
+            }
+        }
+
+        function registrarCompra(e) {
+            e.preventDefault();
+            const prodId = document.getElementById('prodCompra').value;
+            const cantidad = parseInt(document.getElementById('cantCompra').value);
+            const costo = parseFloat(document.getElementById('costoCompra').value);
+            const medida = document.getElementById('txtMedidaCompra').value;
+
+            const prod = inventario.find(p => p.id === prodId);
+            if (prod) {
+                prod.stock = (prod.stock || 0) + cantidad;
+                if (prod.stock > prod.capacidadMax) prod.capacidadMax = Math.ceil(prod.stock * 1.2);
+
+                gastos.push({
+                    id: 'g_' + Date.now(),
+                    productoId: prod.id,
+                    cantidadComprada: cantidad,
+                    fecha: new Date().toLocaleDateString(),
+                    descripcion: `Compra ${cantidad}u. ${prod.nombre}` + (medida ? ` (${medida})` : ''),
+                    monto: costo
+                });
+
+                guardarTodo();
+                document.getElementById('formInventario').reset();
+                document.getElementById('costoCompra').value = '';
+                mostrarNotificacion(`Reabastecido: +${cantidad} u. de ${prod.nombre}`);
+            }
+        }
+
+        function registrarVenta(e) {
+            e.preventDefault();
+            const prodId = document.getElementById('prodVenta').value;
+            const cantidad = parseInt(document.getElementById('cantVenta').value);
+            const precioUnit = parseFloat(document.getElementById('precioUnitarioVenta').value);
+            const precioTotal = parseFloat(document.getElementById('precioVenta').value);
+            const medida = document.getElementById('txtMedidaVenta').value;
+
+            const prod = inventario.find(p => p.id === prodId);
+            if (prod) {
+                if ((prod.stock || 0) < cantidad) {
+                    alert(`⚠️ Stock insuficiente. Quedan ${prod.stock} unidades de ${prod.nombre}`);
+                    return;
+                }
+
+                prod.stock -= cantidad;
+
+                ventas.push({
+                    id: 'v_' + Date.now(),
+                    fecha: new Date().toLocaleDateString(),
+                    mesAnno: new Date().toISOString().slice(0, 7),
+                    productoId: prod.id,
+                    productoNombre: prod.nombre + (medida ? ` (${medida})` : ''),
+                    nombrePuro: prod.nombre,
+                    cantidad: cantidad,
+                    total: precioTotal
+                });
+
+                guardarTodo();
+                document.getElementById('formVenta').reset();
+                document.getElementById('precioVenta').value = '';
+                
+                mostrarNotificacion(`¡Venta Exitosa! Se vendieron ${cantidad} u. de ${prod.nombre}`);
+                if (typeof confetti === 'function') confetti({ particleCount: 50, spread: 60 });
+            }
+        }
+
+        function registrarGasto(e) {
+            e.preventDefault();
+            const desc = document.getElementById('descGasto').value;
+            const monto = parseFloat(document.getElementById('montoGasto').value);
+
+            gastos.push({
+                id: 'g_' + Date.now(),
+                fecha: new Date().toLocaleDateString(),
+                descripcion: desc,
+                monto: monto
+            });
+
+            guardarTodo();
+            document.getElementById('formGasto').reset();
+            mostrarNotificacion(`Gasto registrado: $${monto.toFixed(2)}`);
+        }
+
+        function eliminarVenta(id) {
+            if (confirm("¿Estás seguro de anular esta venta? Las unidades regresarán automáticamente al inventario.")) {
+                const venta = ventas.find(v => v.id === id);
+                if (venta && venta.productoId) {
+                    const prod = inventario.find(p => p.id === venta.productoId);
+                    if (prod) {
+                        prod.stock = (prod.stock || 0) + venta.cantidad;
+                    }
+                }
+                ventas = ventas.filter(v => v.id !== id);
+                guardarTodo();
+                mostrarNotificacion("Venta anulada y stock devuelto.");
+            }
+        }
+
+        function eliminarGasto(id) {
+            if (confirm("¿Estás seguro de anular este gasto/compra? Si correspondía a una entrada de madera, se restarán esas unidades del stock.")) {
+                const gasto = gastos.find(g => g.id === id);
+                if (gasto && gasto.productoId && gasto.cantidadComprada) {
+                    const prod = inventario.find(p => p.id === gasto.productoId);
+                    if (prod) {
+                        prod.stock = Math.max(0, (prod.stock || 0) - gasto.cantidadComprada);
+                    }
+                }
+                gastos = gastos.filter(g => g.id !== id);
+                guardarTodo();
+                mostrarNotificacion("Gasto anulado correctamente.");
+            }
+        }
+
+        function obtenerEstiloBarra(cantidad, capacidadMax) {
+            let porcentaje = Math.min(100, Math.max(0, (cantidad / capacidadMax) * 100));
+            if (cantidad >= 100) porcentaje = 100;
+
+            let background = '';
+            if (cantidad < 10) {
+                background = 'linear-gradient(90deg, #ef4444, #f87171)';
+            } else if (cantidad >= 10 && cantidad < 50) {
+                background = 'linear-gradient(90deg, #d97706, #f59e0b)';
+            } else if (cantidad >= 50 && cantidad < 100) {
+                background = 'linear-gradient(90deg, #84cc16, #10b981)';
+            } else {
+                background = 'linear-gradient(90deg, #10b981, #34d399)';
+            }
+            return { porcentaje, background };
+        }
+
+        function renderInventario() {
+            const container = document.getElementById('gridInventario');
+            if (!container) return;
+            container.innerHTML = '';
+
+            inventario.forEach(prod => {
+                const estilo = obtenerEstiloBarra(prod.stock || 0, prod.capacidadMax || 100);
+                const card = document.createElement('div');
+                card.className = 'product-card-3d';
+                card.setAttribute('data-id', prod.id);
+                
+                card.innerHTML = `
+                    <div class="card-actions">
+                        <button class="btn-action-card edit" onclick="editarProducto('${prod.id}')" title="Editar nombre y stock">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button class="btn-action-card delete" onclick="eliminarProducto('${prod.id}')" title="Eliminar producto">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                    <div class="product-title">
+                        <span><i class="fa-solid fa-grip-vertical drag-handle"></i> ${prod.nombre}</span>
+                    </div>
+                    <div style="margin-top:2px;"><span class="product-badge">${prod.requiereMedida ? 'Medida' : 'Estándar'}</span></div>
+                    <div class="product-qty">${prod.stock || 0} <span>unidades</span></div>
+                    <div class="bar-container-3d">
+                        <div class="bar-fill-3d" style="width: ${estilo.porcentaje}%; background: ${estilo.background};"></div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderMovimientos() {
+            const tbody = document.getElementById('tablaMovimientos');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const lista = [];
+            ventas.forEach(v => lista.push({ tipo: 'VENTA', id: v.id, fecha: v.fecha, detalle: `${v.productoNombre} (x${v.cantidad})`, monto: v.total }));
+            gastos.forEach(g => lista.push({ tipo: 'GASTO', id: g.id, fecha: g.fecha, detalle: g.descripcion, monto: g.monto }));
+
+            lista.slice(-10).reverse().forEach(item => {
+                const esVenta = item.tipo === 'VENTA';
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="color:${esVenta ? '#a7f3d0' : '#fca5a5'}; font-weight:700;">${item.tipo}</td>
+                        <td>${item.fecha}</td>
+                        <td>${item.detalle}</td>
+                        <td style="font-weight:700;">${esVenta ? '+' : '-'}${(item.monto || 0).toFixed(2)}</td>
+                        <td>
+                            <button class="btn-delete-row" onclick="${esVenta ? `eliminarVenta('${item.id}')` : `eliminarGasto('${item.id}')`}">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderAnalisis() {
+            const contenedor = document.getElementById('contenedorRanking');
+            if (!contenedor) return;
+            contenedor.innerHTML = '';
+
+            if (ventas.length === 0) {
+                contenedor.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding: 20px;">Aún no hay suficientes registros de ventas para analizar tendencias.</p>';
+                return;
+            }
+
+            const statsProductos = {};
+            ventas.forEach(v => {
+                const nombre = v.nombrePuro || 'Producto';
+                if (!statsProductos[nombre]) {
+                    statsProductos[nombre] = { totalCantidad: 0, totalIngresos: 0, mesesDemanda: {} };
+                }
+                statsProductos[nombre].totalCantidad += v.cantidad;
+                statsProductos[nombre].totalIngresos += v.total;
+
+                const mes = v.mesAnno || 'General';
+                statsProductos[nombre].mesesDemanda[mes] = (statsProductos[nombre].mesesDemanda[mes] || 0) + v.cantidad;
+            });
+
+            const ranking = Object.keys(statsProductos).sort((a, b) => statsProductos[b].totalCantidad - statsProductos[a].totalCantidad);
+
+            ranking.forEach((prod, index) => {
+                const info = statsProductos[prod];
+                let mejorMes = 'N/A';
+                let maxCantMes = 0;
+                Object.keys(info.mesesDemanda).forEach(m => {
+                    if (info.mesesDemanda[m] > maxCantMes) {
+                        maxCantMes = info.mesesDemanda[m];
+                        mejorMes = m;
+                    }
+                });
+
+                let iconoMedalla = '';
+                if (index === 0) iconoMedalla = '🥇';
+                else if (index === 1) iconoMedalla = '🥈';
+                else if (index === 2) iconoMedalla = '🥉';
+                else iconoMedalla = `#${index + 1}`;
+
+                contenedor.innerHTML += `
+                    <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <div>
+                            <div style="font-weight: 700; color: #a7f3d0; font-size: 0.95rem;">${iconoMedalla} ${prod}</div>
+                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                                Época pico de venta: <strong style="color: #f59e0b;">${mejorMes}</strong> (${maxCantMes} u.)
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 800; color: white; font-size: 1rem;">${info.totalCantidad} u. vendidas</div>
+                            <div style="font-size: 0.78rem; color: #10b981;">Ingresos: $${info.totalIngresos.toFixed(2)}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function actualizarGraficos() {
+            const canvasElem = document.getElementById('chartBalance');
+            if (!canvasElem) return;
+            const ctxBalance = canvasElem.getContext('2d');
+            const totalIngresos = ventas.reduce((acc, v) => acc + (v.total || 0), 0);
+            const totalGastos = gastos.reduce((acc, g) => acc + (g.monto || 0), 0);
+
+            if (chartBalanceInstance) chartBalanceInstance.destroy();
+
+            chartBalanceInstance = new Chart(ctxBalance, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Ingresos ($)', 'Gastos ($)'],
+                    datasets: [{
+                        data: [totalIngresos, totalGastos],
+                        backgroundColor: ['rgba(16, 185, 129, 0.8)', 'rgba(239, 68, 68, 0.8)'],
+                        borderColor: ['#10b981', '#ef4444'],
+                        borderWidth: 1.5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#f3f4f6', font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        function exportarDatos() {
+            const respaldo = { inventario, ventas, gastos };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(respaldo, null, 2));
+            const anchor = document.createElement('a');
+            anchor.setAttribute("href", dataStr);
+            anchor.setAttribute("download", `maderas_imbabura_backup_${new Date().toISOString().slice(0, 10)}.json`);
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+        }
+
+        function importarDatos(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const datos = JSON.parse(evt.target.result);
+                    if (datos.inventario && datos.ventas && datos.gastos) {
+                        inventario = datos.inventario;
+                        ventas = datos.ventas;
+                        gastos = datos.gastos;
+                        guardarTodo();
+                        mostrarNotificacion("Datos restaurados con éxito.");
+                    } else {
+                        alert("⚠️ Archivo no compatible.");
+                    }
+                } catch (err) {
+                    alert("⚠️ Error al importar los datos.");
+                }
+            };
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>
